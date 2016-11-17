@@ -26,5 +26,13 @@ text = word_tokenize("They refuse to permit us to obtain the refuse permit")
 print text
 print nltk.pos_tag(text)
 
-tagged_token = nltk.tag.str2tuple('fly/NN')
-tagged_token
+print "-" * 100
+
+text = word_tokenize("To win is to be victorious")
+print nltk.pos_tag(text)
+
+tagged_token = nltk.tag.str2tuple('win/NN')
+print tagged_token
+
+text = word_tokenize("There is a win on the car!")
+print nltk.pos_tag(text)
