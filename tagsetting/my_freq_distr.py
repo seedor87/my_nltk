@@ -1,28 +1,45 @@
 # -*- coding: utf-8 -*-
 
-import nltk, sys, prettytable
-from pprint import pprint
-from nltk import FreqDist, word_tokenize
-# import nltk.book as books
+import nltk
+from prettytable import PrettyTable
 
-def test1():
-    # with open('/path/to/file') as FileObj:
-    #     for lines in FileObj:
-    #         print lines # or do some other thing with the line...
+def get_pos_tags(text):
+    return nltk.pos_tag(text)
 
-    # text = books.text6
-    # fdist1 = FreqDist(text)
-    # pprint(fdist1.most_common(50))
-    #
-    # text = books.text3
-    # fdist1 = FreqDist(text)
-    # pprint(fdist1.most_common(50))
-    #
-    # text = books.text7
-    # fdist1 = FreqDist(text)
-    # pprint(fdist1.most_common(50))
+def process_string(text, n=50):
 
-    text = """
+    _text = text.decode('utf-8').strip()
+    fd = nltk.FreqDist([word.lower() for word in nltk.word_tokenize(_text)])
+    return fd.most_common(n)
+
+def process_url(url, n=50):
+
+    import urllib
+    from bs4 import BeautifulSoup
+
+    html = urllib.urlopen(url).read().decode('utf8')
+    text = BeautifulSoup(html, "lxml").get_text()
+    fd = nltk.FreqDist(word.lower() for word in nltk.word_tokenize(text))
+    return fd.most_common(n)
+
+
+def process_file(file, n=50):
+
+    import re
+
+    def get_text(file):
+        """Read text from a file, normalizing whitespace and stripping HTML markup."""
+        text = open(file).read()
+        text = re.sub(r'<.*?>', ' ', text)
+        text = re.sub('\s+', ' ', text)
+        return text
+
+    string = get_text(file)
+    string = string.decode('utf-8').strip()
+    fd = nltk.FreqDist(word.lower() for word in nltk.word_tokenize(string))
+    return fd.most_common(n)
+
+text = """
     Graph Database Evaluation and Reference Implementation
     Executive Summary
     A graph database is a database that uses graph structures for queries with nodes, relationships and properties to represent and store data.   Within graph databases, the relationship (and its subsequent properties), is just as important as the node itself.   This relationship allows data in each node to be directly coupled in a unique way, decreasing the time and complexity required to gather associated pieces of information that are related to the object in question.  The relationships contain their own metadata, which is used as part of the query process, providing another layer of filtering for the data queries and results.
@@ -63,32 +80,9 @@ def test1():
     Recommendations for how to identify and build relationships from the data feeds.
     """
 
-
-    text = [line.decode('utf-8').strip() for line in text.split(" ")]
-    text = word_tokenize(str(text))
-    text = nltk.pos_tag(text)
-    fdist1 = FreqDist([tup[0] for tup in text])
-    ret = fdist1.most_common()
-    pprint(ret[2:50])
-
-    from nltk.corpus import brown
-    cfd = nltk.ConditionalFreqDist(
-              (genre, word)
-              for genre in brown.categories()
-              for word in brown.words(categories=genre))
-
-def test2():
-
-    import urllib
-    from bs4 import BeautifulSoup
-
-    def freq_words(url, n):
-        html = urllib.request.urlopen(url).read().decode('utf8')
-        text = BeautifulSoup(html).get_text()
-        freqdist = nltk.FreqDist(word.lower() for word in word_tokenize(text))
-        return [word for (word, _) in fd.most_common(n)]
-
-    constitution = "http://www.archives.gov/exhibits/charters/constitution_transcript.html"
-    freq_words(constitution, 100)
-
-test2()
+pt = PrettyTable()
+pt.add_column("String Run", process_string(text))
+pt.add_column("File Read Run", process_file('GraphDatabaseEvaluationandImplementationCon-ops.txt'))
+pt.add_column("URL Test", process_url(url="http://www.archives.gov/exhibits/charters/constitution_transcript.html"))
+pt.add_column("TXT File Test", process_file('gen_doc_tagset.py'))
+print pt
