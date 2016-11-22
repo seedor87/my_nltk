@@ -25,9 +25,9 @@ def process_url(url, n=50):
 
 def process_file(file, n=50):
 
-    import re
-
     def get_text(file):
+        import re
+
         """Read text from a file, normalizing whitespace and stripping HTML markup."""
         text = open(file).read()
         text = re.sub(r'<.*?>', ' ', text)
@@ -84,5 +84,4 @@ pt = PrettyTable()
 pt.add_column("String Run", process_string(text))
 pt.add_column("File Read Run", process_file('GraphDatabaseEvaluationandImplementationCon-ops.txt'))
 pt.add_column("URL Test", process_url(url="http://www.archives.gov/exhibits/charters/constitution_transcript.html"))
-# pt.add_column("TXT File Test", process_file('gen_doc_tagset.py'))
 print pt

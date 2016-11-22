@@ -1,5 +1,9 @@
 
 from nltk.corpus import wordnet as wn
+from nltk.corpus import sentiwordnet as swn
+
+print list(swn.senti_synsets('slow')) # doctest: +NORMALIZE_WHITESPACE
+
 print wn.synsets('motorcar')
 
 print wn.synset('car.n.01').lemma_names()
