@@ -7,3 +7,4 @@ for tree in parser.parse('a dog barks'.split()):
 
 for tree in parser.parse('Monkey on the car, fuck off!'.split()):
     print(tree.label()['SEM'].simplify())
+

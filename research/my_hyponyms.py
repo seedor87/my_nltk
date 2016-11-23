@@ -8,6 +8,7 @@ from nltk.stem.wordnet import WordNetLemmatizer
 print wn.synset('green.n.01').usage_domains()
 
 print WordNetLemmatizer().lemmatize("bombast", pos="a")
+
 # for synset in list(wn.all_synsets('a')):
 #     print(synset)
 
