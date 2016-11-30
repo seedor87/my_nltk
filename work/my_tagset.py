@@ -72,3 +72,13 @@ if __name__ == '__main__':
         print table
     print 'DONE'
     sys.exit(0)
+
+"""
+Test-set:
+
+test
+testing
+tested
+testers
+(phrase test)
+"""

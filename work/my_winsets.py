@@ -75,14 +75,16 @@ if __name__ == '__main__':
     test_word = 'train'
     poses = [wn.NOUN, wn.ADJ, wn.VERB, wn.ADV]
     for pos in poses:
-        total[pos] = {}
+        total[str(pos)] = {}
         sets = wn.synsets(test_word)
         for set in wn.synsets(test_word):
-            total[pos][set] = {}
+            total[str(pos)][str(set)] = {}
             for lemma in set.lemmas():
-                total[pos][set][lemma] = {}
+                total[str(pos)][str(set)][str(lemma)] = {}
                 for string in lemma.frame_strings():
-                    total[pos][set][lemma][string] = string
+                    total[str(pos)][str(set)][str(lemma)][str(string)] = string
 
 
-    pprint(total)
+    import json
+    with open('data.json', 'w') as fp:
+        json.dump(total, fp, sort_keys=True, indent=4)
