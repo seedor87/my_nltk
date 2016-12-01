@@ -59,17 +59,27 @@ dictionary = {
 
 if __name__ == '__main__':
 
-    while 1:
+    def get_table(sentence):
         table = prettytable.PrettyTable(['WORD', 'Part of Speech', 'Description', 'Examples'])
+        for tup in sentence:
+            info = dictionary[tup[1]]
+            table.add_row([tup[0], tup[1], info[0], info[1][:50]])
+        return table
+    def get_dict(sentence, filter=None):
+        ret = {}
+        for key, val in dictionary.iteritems():
+            ret[key] = []
+        [ret[tup[1]].append(tup[0]) if (tup[1] not in filter) else None for tup in sentence]
+        return ret
+
+    while 1:
         text = raw_input("Please enter something: ")
         if text == 'q':
             break
         text = word_tokenize(text)
         sentence = nltk.pos_tag(text)
-        for tup in sentence:
-            info = dictionary[tup[1]]
-            table.add_row([tup[0], tup[1], info[0], info[1][:50]])
-        print table
+        print get_table(sentence)
+        # print get_dict(sentence)
     print 'DONE'
     sys.exit(0)
 
