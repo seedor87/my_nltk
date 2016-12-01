@@ -65,11 +65,14 @@ if __name__ == '__main__':
             info = dictionary[tup[1]]
             table.add_row([tup[0], tup[1], info[0], info[1][:50]])
         return table
+
     def get_dict(sentence, filter=None):
-        ret = {}
-        for key, val in dictionary.iteritems():
-            ret[key] = []
-        [ret[tup[1]].append(tup[0]) if (tup[1] not in filter) else None for tup in sentence]
+        if filter is None:
+            _filter = dictionary
+        else:
+            _filter = filter
+        ret = dict([(key, []) for key in _filter])
+        [ret[tup[1]].append(tup[0]) if tup[1] in _filter else None for tup in sentence]
         return ret
 
     while 1:
@@ -78,8 +81,8 @@ if __name__ == '__main__':
             break
         text = word_tokenize(text)
         sentence = nltk.pos_tag(text)
-        print get_table(sentence)
-        # print get_dict(sentence)
+        # print get_table(sentence)
+        print get_dict(sentence)
     print 'DONE'
     sys.exit(0)
 
