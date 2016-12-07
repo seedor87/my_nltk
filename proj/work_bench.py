@@ -40,20 +40,34 @@ def synset_method_values(synset):
     return name_value_pairs
 
 def main():
+
+    def dictify(dict, syn_set, steps=3):
+        if steps < 1:
+            for syn in syn_set:
+                for method, set in synset_method_values(syn):
+                    dict[method] = set
+        else:
+            for syn in syn_set:
+                for method, set in synset_method_values(syn):
+                    dict[method] = {}
+                    dictify(dict[method], set, steps-1)
+
     while 1:
         total = {}
-        for syn_set in wn.synsets(raw_input('Enter the word here >>> ')):
-            key = str(syn_set)[8:str(syn_set).find('.')]    # grab name of the input word's synset
-            total[key] = {}
-            for method0, set0 in synset_method_values(syn_set):
-                total[key][method0] = {}
-                for a in set0:
-                    for method1, set1 in synset_method_values(a):
-                        total[key][method0][method1] = {}
-                        for b in set1:
-                            for method2, set2 in synset_method_values(b):
-                                total[key][method0][method1][method2] = set2
-        return total
+        dictify(total, wn.synsets(raw_input('Enter the word here >>> ')), steps=3)
+
+        # for syn_set in wn.synsets(raw_input('Enter the word here >>> ')):
+        #     node = str(syn_set)[8:str(syn_set).find('.')]    # grab name of the input word's synset
+        #     total[node] = {}
+        #     for method0, set0 in synset_method_values(syn_set):
+        #         total[key][method0] = {}
+        #         for a in set0:
+        #             for method1, set1 in synset_method_values(a):
+        #                 total[key][method0][method1] = {}
+        #                 for b in set1:
+        #                     for method2, set2 in synset_method_values(b):
+        #                         total[key][method0][method1][method2] = set2
+        pprint(total)
 
 def test():
     print decypher(synset='Synset(\'assume.v.05\')')
@@ -61,6 +75,4 @@ def test():
 
 if __name__ == '__main__':
     ret = main()
-    print ret.keys()
-    for key in ret.keys():
-        print '\t', ret[key]
+    pprint(ret)
