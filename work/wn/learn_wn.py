@@ -1,4 +1,3 @@
-
 """
 hypernym - a word with a broad meaning that more specific words fall under; a superordinate. For example, color is a hypernym of red.
 

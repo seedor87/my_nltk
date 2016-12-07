@@ -67,10 +67,10 @@ if __name__ == '__main__':
         return table
 
     def get_dict(sentence, filter=None):
-        if filter is None:
-            _filter = dictionary
-        else:
+        if filter is not None:
             _filter = filter
+        else:
+            _filter = set([tup[1] for tup in sentence])
         ret = dict([(key, []) for key in _filter])
         [ret[tup[1]].append(tup[0]) if tup[1] in _filter else None for tup in sentence]
         return ret
