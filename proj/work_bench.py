@@ -2,12 +2,7 @@ from nltk.corpus import wordnet as wn
 from collections import defaultdict
 from pprint import pprint
 
-def decypher(synset):
-    word = synset[8:synset.find('.')]
-    pos = synset[synset.find('.') + 1]
-    num = synset[-4:-2]
-    print word, pos, num
-
+def decypher(pos, word):
     if pos is 'NN' or pos is 'NNS' or pos is 'NNP' or pos is 'NNPS':
         return word, 'n'
     elif pos is 'VB' or pos is 'VBD' or pos is 'VBG' or pos is'VBN' or pos is 'VBP' or pos is'VBZ':
@@ -39,11 +34,21 @@ def synset_method_values(synset):
             name_value_pairs.append((method_name, vals))
     return name_value_pairs
 
-def dictify_on_node(dict, node, path, steps=2):
-    for method, sets in synset_method_values(node):
+def gen_closure(syn_set, steps):
+    ret = {}
+    n = 1
+    while n <= steps:
+        for method, sets in synset_method_values(syn_set):
+            for set in sets:
+                ret[method] = (list(set.closure(method, depth=n)))
+        yield ret
+        n += 1
+
+def dictify_on_node(dict, syn_set, path, steps=2):
+    for method, sets in synset_method_values(syn_set):
         for set in sets:
             _path = list(path)
-            _path.append(method)
+            _path.append((syn_set, method))
             key = key_wrap(set)
             if steps < 1:
                 dict[key] = _path
@@ -53,17 +58,17 @@ def dictify_on_node(dict, node, path, steps=2):
 
 def dictify_on_method(dict, syn_set, steps=3):
     for syn in syn_set:
-            for method, sets in synset_method_values(syn):
-                if steps < 1:
-                    dict[method] = [key_wrap(s) for s in sets]
-                else:
-                    dict[method] = {}
-                    dictify_on_method(dict[method], sets, steps - 1)
+        for method, sets in synset_method_values(syn):
+            if steps < 1:
+                dict[method] = (method, syn)
+            else:
+                dict[method] = {}
+                dictify_on_method(dict[method], sets, steps - 1)
 
 def key_wrap(syn_set):
     _syn_set = str(syn_set)
     index_first_period = _syn_set.find('.')
-    word = _syn_set[8:]
+    word = _syn_set[8:index_first_period]
     pos = _syn_set[index_first_period + 1]
     num = _syn_set[-4:-2]
     return word, pos, num
@@ -73,29 +78,39 @@ def main(key='method'):
     if key is 'method':
         while 1:
             total = {}
-            dictify_on_method(total, wn.synsets(raw_input('Enter the word here >>> ')), steps=1)
+            dictify_on_method(total, wn.synsets(raw_input('Enter the word here >>> ')), steps=2)
             pprint(total)
     else:
         while 1:
             total = {}
             for syn_set in wn.synsets(raw_input('Enter the word here >>> ')):
-                dictify_on_node(total, syn_set, [], steps=1)
+                dictify_on_node(total, syn_set, [], steps=2)
             pprint(total)
 
 def test():
     print "testing"
 
-    total = {}
-    for syn_set in wn.synsets(raw_input('Enter the word here >>> ')):
-        dictify_on_node(total, syn_set, [], steps=2)
-    pprint(total)
+    hypo = lambda s: s.hyponyms()
+    hyper = lambda s: s.hypernyms()
+    sets = wn.synsets(raw_input('Enter the word here >>> '))
+    gen = gen_closure(sets[0], steps=3)
+    print next(gen)
+    print next(gen)
+    print next(gen)
 
-    total = {}
-    dictify_on_method(total, wn.synsets(raw_input('Enter the word here >>> ')), steps=2)
-    pprint(total)
 
-    print total['hypernyms']['hyponyms']
+    # total = {}
+    # for syn_set in wn.synsets(raw_input('Enter the word here >>> ')):
+    #     dictify_on_node(total, syn_set, [], steps=2)
+    # pprint(total)
+    #
+    # total = {}
+    # dictify_on_method(total, wn.synsets(raw_input('Enter the word here >>> ')), steps=2)
+    # pprint(total)
+    #
+    # print total['hypernyms']['hyponyms']
 
 if __name__ == '__main__':
     # main(key='node')
     test()
+
