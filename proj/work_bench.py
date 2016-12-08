@@ -90,14 +90,32 @@ def main(key='method'):
 def test():
     print "testing"
 
-    hypo = lambda s: s.hyponyms()
-    hyper = lambda s: s.hypernyms()
-    sets = wn.synsets(raw_input('Enter the word here >>> '))
-    gen = gen_closure(sets[0], steps=3)
-    print next(gen)
-    print next(gen)
-    print next(gen)
+    def key_wrap(syn_set):
+        _syn_set = str(syn_set)
+        index_first_period = _syn_set.find('.')
+        word = _syn_set[8:index_first_period]
+        return word
 
+    syn_sets = wn.synsets(raw_input('Enter the word here >>> '))
+    total = {}
+    for syn_set in syn_sets:
+        key = key_wrap(syn_set)
+        total[key] = {}
+        for method, sets in synset_method_values(syn_set):
+            total[key][method] = {}
+            for set in sets:
+                _key = key_wrap(set)
+                total[key][method][_key] = {}
+                for _method, _sets in synset_method_values(set):
+                    total[key][method][_key][_method] = {}
+                    for _set in _sets:
+                        __key = key_wrap(_set)
+                        total[key][method][_key][_method][__key] = {}
+                        for __method, __sets in synset_method_values(_set):
+                            total[key][method][_key][_method][__key][__method] = [key_wrap(__set) for __set in __sets]
+
+    pprint(total)
+    print total['quiz']['hypernyms']['examine']
 
     # total = {}
     # for syn_set in wn.synsets(raw_input('Enter the word here >>> ')):
