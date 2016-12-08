@@ -39,40 +39,63 @@ def synset_method_values(synset):
             name_value_pairs.append((method_name, vals))
     return name_value_pairs
 
-def main():
+def dictify_on_node(dict, node, path, steps=2):
+    for method, sets in synset_method_values(node):
+        for set in sets:
+            _path = list(path)
+            _path.append(method)
+            key = key_wrap(set)
+            if steps < 1:
+                dict[key] = _path
+            else:
+                dict[key] = {}
+                dictify_on_node(dict, set, _path, steps - 1)
 
-    def dictify(dict, syn_set, steps=3):
-        if steps < 1:
-            for syn in syn_set:
-                for method, set in synset_method_values(syn):
-                    dict[method] = set
-        else:
-            for syn in syn_set:
-                for method, set in synset_method_values(syn):
+def dictify_on_method(dict, syn_set, steps=3):
+    for syn in syn_set:
+            for method, sets in synset_method_values(syn):
+                if steps < 1:
+                    dict[method] = [key_wrap(s) for s in sets]
+                else:
                     dict[method] = {}
-                    dictify(dict[method], set, steps-1)
+                    dictify_on_method(dict[method], sets, steps - 1)
 
-    while 1:
-        total = {}
-        dictify(total, wn.synsets(raw_input('Enter the word here >>> ')), steps=3)
+def key_wrap(syn_set):
+    _syn_set = str(syn_set)
+    index_first_period = _syn_set.find('.')
+    word = _syn_set[8:]
+    pos = _syn_set[index_first_period + 1]
+    num = _syn_set[-4:-2]
+    return word, pos, num
 
-        # for syn_set in wn.synsets(raw_input('Enter the word here >>> ')):
-        #     node = str(syn_set)[8:str(syn_set).find('.')]    # grab name of the input word's synset
-        #     total[node] = {}
-        #     for method0, set0 in synset_method_values(syn_set):
-        #         total[key][method0] = {}
-        #         for a in set0:
-        #             for method1, set1 in synset_method_values(a):
-        #                 total[key][method0][method1] = {}
-        #                 for b in set1:
-        #                     for method2, set2 in synset_method_values(b):
-        #                         total[key][method0][method1][method2] = set2
-        pprint(total)
+def main(key='method'):
+
+    if key is 'method':
+        while 1:
+            total = {}
+            dictify_on_method(total, wn.synsets(raw_input('Enter the word here >>> ')), steps=1)
+            pprint(total)
+    else:
+        while 1:
+            total = {}
+            for syn_set in wn.synsets(raw_input('Enter the word here >>> ')):
+                dictify_on_node(total, syn_set, [], steps=1)
+            pprint(total)
 
 def test():
-    print decypher(synset='Synset(\'assume.v.05\')')
-    pass
+    print "testing"
+
+    total = {}
+    for syn_set in wn.synsets(raw_input('Enter the word here >>> ')):
+        dictify_on_node(total, syn_set, [], steps=2)
+    pprint(total)
+
+    total = {}
+    dictify_on_method(total, wn.synsets(raw_input('Enter the word here >>> ')), steps=2)
+    pprint(total)
+
+    print total['hypernyms']['hyponyms']
 
 if __name__ == '__main__':
-    ret = main()
-    pprint(ret)
+    # main(key='node')
+    test()
