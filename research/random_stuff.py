@@ -155,6 +155,6 @@ def stem(word):
 
 # demo_regex()
 
-print stem('expectently')
+# print stem('expectently')
 
 sys.exit(0)
